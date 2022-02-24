@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-cd:
-    uses: pinnacles/common-cicd-actions/.github/workflows/cd.yml@test-cd
+    uses: pinnacles/common-cicd-actions/.github/workflows/cd.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0

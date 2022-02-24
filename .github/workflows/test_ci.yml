@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-ci-ruby:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
@@ -18,7 +18,7 @@ jobs:
       go_version: ""
 
   test-ci-node:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: false
       ruby_version: ""
@@ -29,7 +29,7 @@ jobs:
       go_version: ""
 
   test-ci-go:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: false
       ruby_version: ""
@@ -40,7 +40,7 @@ jobs:
       go_version: 1.17.6
 
   test-ci-ruby-and-node:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
@@ -51,7 +51,7 @@ jobs:
       go_version: ""
 
   test-ci-test-in-parallel:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
