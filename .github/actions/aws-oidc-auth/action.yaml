@@ -1,0 +1,23 @@
+name: aws oidc auth
+
+inputs:
+  aws-region:
+    description: "AWS Region"
+    required: true
+  role-to-assume:
+    description: "AWS IAM Role to assume"
+    required: true
+  role-session-name:
+    description: "AWS IAM Role Session Name. Shown on CloudTrail"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@b8c74de753fbcb4868bf2011fb2e15826ce973af
+    with:
+      aws-region: ${{ inputs.aws-region }}
+      role-to-assume: ${{ inputs.role-to-assume }}
+      role-session-name: ${{ inputs.role-session-name }}
+      role-duration-seconds: 900

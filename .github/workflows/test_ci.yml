@@ -1,0 +1,63 @@
+name: Test ci.yml
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test-ci-ruby:
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    with:
+      use_ruby: true
+      ruby_version: 3.1.0
+      use_node: false
+      node_version: ""
+      node_package_manager: ""
+      use_go: false
+      go_version: ""
+
+  test-ci-node:
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    with:
+      use_ruby: false
+      ruby_version: ""
+      use_node: true
+      node_version: 17.4.0
+      node_package_manager: "yarn"
+      use_go: false
+      go_version: ""
+
+  test-ci-go:
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    with:
+      use_ruby: false
+      ruby_version: ""
+      use_node: false
+      node_version: ""
+      node_package_manager: ""
+      use_go: true
+      go_version: 1.17.6
+
+  test-ci-ruby-and-node:
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    with:
+      use_ruby: true
+      ruby_version: 3.1.0
+      use_node: true
+      node_version: 17.4.0
+      node_package_manager: "yarn"
+      use_go: false
+      go_version: ""
+
+  test-ci-test-in-parallel:
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@master
+    with:
+      use_ruby: true
+      ruby_version: 3.1.0
+      use_node: false
+      node_version: ""
+      node_package_manager: ""
+      use_go: false
+      go_version: ""
+      test_in_parallel: true

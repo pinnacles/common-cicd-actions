@@ -1,0 +1,59 @@
+name: Setup languages
+description: |
+  Setup languages runtime
+inputs:
+  use_ruby:
+    description: 'whether use ruby or not'
+    required: false
+    default: false
+    type: boolean
+  ruby_version:
+    description: 'ruby version'
+    required: false
+    type: string
+  use_node:
+    description: 'whether use node or not'
+    required: false
+    default: false
+    type: boolean
+  node_version:
+    description: 'node version'
+    required: false
+    type: string
+  node_package_manager:
+    description: 'node package manager name'
+    required: false
+    type: string
+  use_go:
+    description: 'whether use go or not'
+    required: false
+    default: false
+    type: boolean
+  go_version:
+    description: 'go version'
+    required: false
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Setup ruby
+      if: ${{ inputs.use_ruby == 'true' }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.ruby_version }}
+        bundler-cache: true
+    - name: Setup node
+      if: ${{ inputs.use_node == 'true' }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: ${{ inputs.node_package_manager }}
+    - name: Run yarn install
+      if: ${{ inputs.use_node == 'true' }}
+      shell: bash
+      run: yarn install
+    - name: Setup go
+      if: ${{ inputs.use_go == 'true' }}
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ inputs.go_version }}

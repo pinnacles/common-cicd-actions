@@ -1,0 +1,141 @@
+name: Common CD reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'environment name'
+        required: false
+        default: sandbox
+        type: string
+      use_ruby:
+        description: 'whether use ruby or not'
+        required: false
+        default: false
+        type: boolean
+      ruby_version:
+        description: 'ruby version'
+        required: false
+        type: string
+      use_node:
+        description: 'whether use node or not'
+        required: false
+        default: false
+        type: boolean
+      node_version:
+        description: 'node version'
+        required: false
+        type: string
+      node_package_manager:
+        description: 'node package manager name'
+        required: false
+        type: string
+      use_go:
+        description: 'whether use go or not'
+        required: false
+        default: false
+        type: boolean
+      go_version:
+        description: 'go version'
+        required: false
+        type: string
+      dockerfile_path:
+        description: 'Dockerfile path'
+        required: false
+        default: Dockerfile
+        type: string
+    secrets:
+      github_pat:
+        description: 'Personal Access Token of bot user'
+        required: false
+      aws_region:
+        description: 'AWS region name'
+        required: true
+      aws_iam_role:
+        description: 'AWS IAM role arn'
+        required: true
+      aws_ecr_repository:
+        description: 'AWS ECR repository name'
+        required: true
+
+jobs:
+  dependency-resolution:
+    name: resolve dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+
+  build-and-push:
+    name: execute `make build & docker build & docker push`
+    needs: dependency-resolution
+    runs-on: ubuntu-latest
+    outputs:
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - name: Configure AWS Credentials
+        uses: ./.github/actions/aws-oidc-auth
+        with:
+          aws-region: ${{ secrets.aws_region }}
+          role-to-assume: ${{ secrets.aws_iam_role }}
+          role-session-name: session-name-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: aws-actions/amazon-ecr-login@v1
+        id: login-ecr
+      - run: |
+          make build
+        env:
+          ACTION_TYPE: CD
+          ENVIRONMENT: ${{ inputs.environment }}
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
+      - uses: docker/metadata-action@v3
+        id: meta
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.aws_ecr_repository }}
+          tags: |
+            type=sha,prefix=
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ${{ inputs.dockerfile_path }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  post-process:
+    name: execute `make post-process`
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make post-process
+        env:
+          ACTION_TYPE: CD
+          ENVIRONMENT: ${{ inputs.environment }}
+          IMAGE_TAG: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.github_pat }}

@@ -1,0 +1,283 @@
+name: Common CI reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      use_ruby:
+        description: 'whether use ruby or not'
+        required: false
+        default: false
+        type: boolean
+      ruby_version:
+        description: 'ruby version'
+        required: false
+        type: string
+      use_node:
+        description: 'whether use node or not'
+        required: false
+        default: false
+        type: boolean
+      node_version:
+        description: 'node version'
+        required: false
+        type: string
+      node_package_manager:
+        description: 'node package manager name'
+        required: false
+        type: string
+      use_go:
+        description: 'whether use go or not'
+        required: false
+        default: false
+        type: boolean
+      go_version:
+        description: 'go version'
+        required: false
+        type: string
+      use_mysql:
+        description: 'whether use mysql or not'
+        required: false
+        default: false
+        type: boolean
+      mysql_version:
+        description: 'mysql version'
+        required: false
+        type: string
+      test_in_parallel:
+        description: 'whether test in parallel or not'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  dependency-resolution:
+    name: resolve dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+
+  lint:
+    name: execute `make lint`
+    needs: dependency-resolution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - run: make lint
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+
+  test:
+    if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == false }}
+    name: execute `make test`
+    needs: dependency-resolution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - run: make test
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+
+  test-with-mysql:
+    if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
+    name: execute `make test`
+    needs: dependency-resolution
+    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    services:
+      db:
+        image: mysql:${{ inputs.mysql_version }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - run: make test
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+          MYSQL_VERSION: ${{ inputs.mysql_version }}
+
+  test-in-parallel:
+    if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == true }}
+    name: execute `make test`
+    needs: dependency-resolution
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node_count: [4]
+        node_index: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: report-${{ github.head_ref }}
+          path: report-${{ github.head_ref }}
+        continue-on-error: true
+      - run: |
+          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          chmod +x split-test
+      - run: make test
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+          NODE_COUNT: ${{ matrix.node_count }}
+          NODE_INDEX: ${{ matrix.node_index }}
+          JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
+          JUNIT_REPORT_DIR_NEW: report
+      - uses: actions/upload-artifact@v2
+        with:
+          name: report-${{ github.head_ref }}
+          path: report
+          if-no-files-found: error
+
+
+  test-in-parallel-with-mysql:
+    if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
+    name: execute `make test`
+    needs: dependency-resolution
+    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    services:
+      db:
+        image: mysql:${{ inputs.mysql_version }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      fail-fast: false
+      matrix:
+        node_count: [4]
+        node_index: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: report-${{ github.head_ref }}
+          path: report-${{ github.head_ref }}
+        continue-on-error: true
+      - run: |
+          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          chmod +x split-test
+      - run: make test
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+          NODE_COUNT: ${{ matrix.node_count }}
+          NODE_INDEX: ${{ matrix.node_index }}
+          JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
+          JUNIT_REPORT_DIR_NEW: report
+      - uses: actions/upload-artifact@v2
+        with:
+          name: report-${{ github.head_ref }}
+          path: report
+          if-no-files-found: error
+
+  build:
+    name: execute `make build`
+    needs: dependency-resolution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-lang
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - run: make build
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+
+  post-process:
+    name: execute `make post-process`
+    needs: [lint, test, test-with-mysql, test-in-parallel, test-in-parallel-with-mysql, build]
+    if: ${{ ! failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make post-process
+        env:
+          ACTION_TYPE: CI
