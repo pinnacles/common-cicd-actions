@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -129,7 +129,7 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -158,7 +158,7 @@ jobs:
         node_index: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -216,7 +216,7 @@ jobs:
         node_index: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -255,7 +255,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
