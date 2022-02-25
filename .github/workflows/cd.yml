@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -86,7 +86,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
-      - uses: ./.github/actions/setup-lang
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -96,7 +96,7 @@ jobs:
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - name: Configure AWS Credentials
-        uses: ./.github/actions/aws-oidc-auth
+        uses: pinnacles/common-cicd-actions/.github/actions/aws-oidc-auth@v0.1.0
         with:
           aws-region: ${{ secrets.aws_region }}
           role-to-assume: ${{ secrets.aws_iam_role }}
