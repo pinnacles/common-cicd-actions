@@ -48,6 +48,10 @@ on:
         required: false
         default: false
         type: boolean
+    secrets:
+      github_pat:
+        description: 'Personal Access Token of bot user'
+        required: false
 
 jobs:
   dependency-resolution:
@@ -109,6 +113,7 @@ jobs:
           RUBY_VERSION: ${{ inputs.ruby_version }}
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
 
   test-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
@@ -145,6 +150,7 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
           MYSQL_VERSION: ${{ inputs.mysql_version }}
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
 
   test-in-parallel:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == true }}
@@ -185,12 +191,12 @@ jobs:
           NODE_INDEX: ${{ matrix.node_index }}
           JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
           JUNIT_REPORT_DIR_NEW: report
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
       - uses: actions/upload-artifact@v2
         with:
           name: report-${{ github.head_ref }}
           path: report
           if-no-files-found: error
-
 
   test-in-parallel-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
@@ -243,6 +249,7 @@ jobs:
           NODE_INDEX: ${{ matrix.node_index }}
           JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
           JUNIT_REPORT_DIR_NEW: report
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
       - uses: actions/upload-artifact@v2
         with:
           name: report-${{ github.head_ref }}

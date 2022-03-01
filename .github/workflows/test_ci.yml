@@ -16,6 +16,7 @@ jobs:
       node_package_manager: ""
       use_go: false
       go_version: ""
+      github_pat: dummy
 
   test-ci-node:
     uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
@@ -27,6 +28,7 @@ jobs:
       node_package_manager: "yarn"
       use_go: false
       go_version: ""
+      github_pat: dummy
 
   test-ci-go:
     uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
@@ -38,6 +40,7 @@ jobs:
       node_package_manager: ""
       use_go: true
       go_version: 1.17.6
+      github_pat: dummy
 
   test-ci-ruby-and-node:
     uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
@@ -49,6 +52,7 @@ jobs:
       node_package_manager: "yarn"
       use_go: false
       go_version: ""
+      github_pat: dummy
 
   test-ci-test-in-parallel:
     uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
@@ -61,3 +65,4 @@ jobs:
       use_go: false
       go_version: ""
       test_in_parallel: true
+      github_pat: dummy
