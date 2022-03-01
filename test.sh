@@ -31,3 +31,7 @@ if [ -n "${NODE_COUNT}" ]; then
 	mkdir ${JUNIT_REPORT_DIR_NEW}
 	touch ${JUNIT_REPORT_DIR_NEW}/rspec-${NODE_COUNT}.xml
 fi
+
+if [ -n "${GITHUB_TOKEN}" ]; then
+	test "${GITHUB_TOKEN}" = dummy
+fi
