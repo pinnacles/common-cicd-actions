@@ -79,7 +79,7 @@ jobs:
     needs: dependency-resolution
     runs-on: ubuntu-latest
     outputs:
-      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
+      image_tag: ${{ steps.meta.outputs.tags }}
     permissions:
       contents: write
       id-token: write
@@ -137,5 +137,5 @@ jobs:
         env:
           ACTION_TYPE: CD
           ENVIRONMENT: ${{ inputs.environment }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
