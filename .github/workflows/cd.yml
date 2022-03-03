@@ -79,7 +79,7 @@ jobs:
     needs: dependency-resolution
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
+      image_tag: ${{ steps.meta.outputs.version }}
     permissions:
       contents: write
       id-token: write
