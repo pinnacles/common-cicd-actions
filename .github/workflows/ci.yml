@@ -194,7 +194,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_pat }}
       - uses: actions/upload-artifact@v2
         with:
-          name: report-${{ github.head_ref }}
+          name: report-${{ github.sha }}
           path: report
           if-no-files-found: error
 
@@ -252,7 +252,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github_pat }}
       - uses: actions/upload-artifact@v2
         with:
-          name: report-${{ github.head_ref }}
+          name: report-${{ github.sha }}
           path: report
           if-no-files-found: error
 
