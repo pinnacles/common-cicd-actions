@@ -160,7 +160,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_count: [4]
+        node_count: [8]
         node_index: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v2
@@ -218,7 +218,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_count: [4]
+        node_count: [8]
         node_index: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v2
