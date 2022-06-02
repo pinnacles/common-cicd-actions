@@ -84,6 +84,7 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
+      - uses: reviewdog/action-setup@v1
       - run: make lint
         env:
           ACTION_TYPE: CI
