@@ -1,5 +1,4 @@
 name: Setup Reviewdog
-
 runs:
   using: "composite"
   steps:
