@@ -84,12 +84,14 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
+      - uses: reviewdog/action-setup@v1
       - run: make lint
         env:
           ACTION_TYPE: CI
           RUBY_VERSION: ${{ inputs.ruby_version }}
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_pat }}
 
   test:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == false }}
