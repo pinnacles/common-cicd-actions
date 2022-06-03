@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -84,7 +84,7 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@v0.2.13
       - run: make lint
         env:
           ACTION_TYPE: CI
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -136,7 +136,7 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -166,7 +166,7 @@ jobs:
         node_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -224,7 +224,7 @@ jobs:
         node_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
@@ -264,7 +264,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.2.12
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
