@@ -4,10 +4,61 @@ on:
   pull_request:
     branches:
       - "*"
+  workflow_call:
+    inputs:
+      use_ruby:
+        description: 'whether use ruby or not'
+        required: false
+        default: false
+        type: boolean
+      ruby_version:
+        description: 'ruby version'
+        required: false
+        type: string
+      use_node:
+        description: 'whether use node or not'
+        required: false
+        default: false
+        type: boolean
+      node_version:
+        description: 'node version'
+        required: false
+        type: string
+      node_package_manager:
+        description: 'node package manager name'
+        required: false
+        type: string
+      use_go:
+        description: 'whether use go or not'
+        required: false
+        default: false
+        type: boolean
+      go_version:
+        description: 'go version'
+        required: false
+        type: string
+      use_mysql:
+        description: 'whether use mysql or not'
+        required: false
+        default: false
+        type: boolean
+      mysql_version:
+        description: 'mysql version'
+        required: false
+        type: string
+      test_in_parallel:
+        description: 'whether test in parallel or not'
+        required: false
+        default: false
+        type: boolean
+    secrets:
+      github_pat:
+        description: 'Personal Access Token of bot user'
+        required: false
 
 jobs:
   test-ci-ruby:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@fukumone/add_reviewdog_11
     with:
       use_ruby: true
       ruby_version: 3.1.0
@@ -20,7 +71,7 @@ jobs:
       github_pat: dummy
 
   test-ci-node:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@fukumone/add_reviewdog_11
     with:
       use_ruby: false
       ruby_version: ""
@@ -33,7 +84,7 @@ jobs:
       github_pat: dummy
 
   test-ci-go:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@fukumone/add_reviewdog_11
     with:
       use_ruby: false
       ruby_version: ""
@@ -46,7 +97,7 @@ jobs:
       github_pat: dummy
 
   test-ci-ruby-and-node:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@fukumone/add_reviewdog_11
     with:
       use_ruby: true
       ruby_version: 3.1.0
@@ -59,7 +110,7 @@ jobs:
       github_pat: dummy
 
   test-ci-test-in-parallel:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@fukumone/add_reviewdog_11
     with:
       use_ruby: true
       ruby_version: 3.1.0
