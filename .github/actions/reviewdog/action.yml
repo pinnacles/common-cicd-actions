@@ -1,21 +1,31 @@
 name: Setup Reviewdog
-
+inputs:
+  github_token:
+    required: true
+    default: ""
+    type: string
 runs:
   using: "composite"
   steps:
-    - name: Setup reviewdog/eslint
-      uses: reviewdog/action-eslint@v1
-      with:
-        reporter: github-pr-review
-        eslint_flags: 'frontend/'
-    - name: Setup reviewdog/rubocop
-      uses: reviewdog/action-rubocop@v2
-      with:
-        rubocop_version: gemfile
-        rubocop_extensions: rubocop-rails:gemfile rubocop-rspec:gemfile
-        reporter: github-pr-review
+    # - name: Setup reviewdog/eslint
+    #   uses: reviewdog/action-eslint@v1
+    #   with:
+    #     eslint_flags: 'frontend/'
+    #     reporter: github-pr-review
+    #     github_token: ${{ inputs.github_token }}
+    #     fail_on_error: true
+    # - name: Setup reviewdog/rubocop
+    #   uses: reviewdog/action-rubocop@v2
+    #   with:
+    #     rubocop_version: gemfile
+    #     rubocop_extensions: rubocop-rails:gemfile rubocop-rspec:gemfile rubocop-performance:gemfile
+    #     reporter: github-pr-review
+    #     github_token: ${{ inputs.github_token }}
+    #     fail_on_error: true
     - name: Setup reviewdog/brakeman
       uses: reviewdog/action-brakeman@v2
       with:
         brakeman_version: 4.8.2
         reporter: github-pr-review
+        github_token: ${{ inputs.github_token }}
+        fail_on_error: true

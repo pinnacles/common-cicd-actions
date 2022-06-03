@@ -84,7 +84,9 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@v0.2.13
+      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@v0.2.16
+        with:
+          github_token: ${{ secrets.github_pat }}
       - run: make lint
         env:
           ACTION_TYPE: CI
