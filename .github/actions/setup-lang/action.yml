@@ -57,5 +57,3 @@ runs:
       uses: actions/setup-go@v2
       with:
         go-version: ${{ inputs.go_version }}
-    - name: Setup reviewdog
-      uses: reviewdog/action-setup@v1
