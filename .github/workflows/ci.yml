@@ -4,64 +4,67 @@ on:
   workflow_call:
     inputs:
       use_ruby:
-        description: 'whether use ruby or not'
+        description: "whether use ruby or not"
         required: false
         default: false
         type: boolean
       ruby_version:
-        description: 'ruby version'
+        description: "ruby version"
         required: false
         type: string
       use_node:
-        description: 'whether use node or not'
+        description: "whether use node or not"
         required: false
         default: false
         type: boolean
       node_version:
-        description: 'node version'
+        description: "node version"
         required: false
         type: string
       node_package_manager:
-        description: 'node package manager name'
+        description: "node package manager name"
         required: false
         type: string
       use_go:
-        description: 'whether use go or not'
+        description: "whether use go or not"
         required: false
         default: false
         type: boolean
       go_version:
-        description: 'go version'
+        description: "go version"
         required: false
         type: string
       use_mysql:
-        description: 'whether use mysql or not'
+        description: "whether use mysql or not"
         required: false
         default: false
         type: boolean
       mysql_version:
-        description: 'mysql version'
+        description: "mysql version"
         required: false
         type: string
       test_in_parallel:
-        description: 'whether test in parallel or not'
+        description: "whether test in parallel or not"
         required: false
         default: false
         type: boolean
       test_ci_mode:
-        description: 'whether test_ci or not'
+        description: "whether test_ci or not"
         required: false
         default: false
         type: boolean
     secrets:
       github_pat:
-        description: 'Personal Access Token of bot user'
+        description: "Personal Access Token of bot user"
         required: false
 
 jobs:
   dependency-resolution:
     name: resolve dependencies
     runs-on: ubuntu-latest
+    outputs:
+      pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
+      allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
@@ -73,7 +76,11 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-
+      - name: store pull request number with output parameter
+        run: echo "::set-output name=pull_request_number::$(gh pr view --json number -q .number || echo "")"
+        id: pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
   lint:
     name: execute `make lint`
     needs: dependency-resolution
@@ -126,7 +133,6 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-
   test-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
     name: execute `make test`
@@ -215,6 +221,9 @@ jobs:
     name: execute `make test`
     needs: dependency-resolution
     runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    outputs:
+      allow_simplecov_action: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
+      pull_request_number: ${{ needs.dependency-resolution.outputs.pull_request_number }}
     services:
       db:
         image: mysql:${{ inputs.mysql_version }}
@@ -262,11 +271,63 @@ jobs:
           JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
           JUNIT_REPORT_DIR_NEW: report
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          COVERAGE: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
+      - name: move coverage report
+        if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
+        run: mv coverage/.resultset.json coverage/.resultset-${{ matrix.node_index }}.json
+      - name: stash simplecov coverage results
+        if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: tmp-coverage-report
+          path: coverage
+          if-no-files-found: error
       - uses: actions/upload-artifact@v2
         with:
           name: report-${{ github.sha }}
           path: report
           if-no-files-found: error
+
+  simplecov-report-action:
+    name: merge and check coverage
+    needs: [test-in-parallel-with-mysql]
+    if: ${{ success() && needs.test-in-parallel-with-mysql.outputs.allow_simplecov_action == 'true' }}
+    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: tmp-coverage-report
+          path: coverage
+      - run: bundle exec rake coverage:report
+      - uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: |
+            coverage/assets/
+            coverage/coverage.json
+            coverage/index.html
+          if-no-files-found: error
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: tmp-coverage-report
+          failOnError: true
+      - uses: pinnacles/simplecov-report-action@main
+        if: ${{ needs.test-in-parallel-with-mysql.outputs.pull_request_number != '' }}
+        with:
+          token: ${{ secrets.github_pat }}
+          event_name: push
+          pr_number: ${{ needs.test-in-parallel-with-mysql.outputs.pull_request_number }}
+          head_branch: master
 
   build:
     name: execute `make build`
@@ -292,7 +353,15 @@ jobs:
 
   post-process:
     name: execute `make post-process`
-    needs: [lint, test, test-with-mysql, test-in-parallel, test-in-parallel-with-mysql, build]
+    needs:
+      [
+        lint,
+        test,
+        test-with-mysql,
+        test-in-parallel,
+        test-in-parallel-with-mysql,
+        build,
+      ]
     if: ${{ ! failure() }}
     runs-on: ubuntu-latest
     steps:
