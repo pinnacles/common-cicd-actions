@@ -25,7 +25,6 @@ runs:
     - name: Setup reviewdog/brakeman
       uses: reviewdog/action-brakeman@v2
       with:
-        brakeman_version: 5.2.2
         reporter: github-pr-review
         github_token: ${{ inputs.github_token }}
         fail_on_error: true
