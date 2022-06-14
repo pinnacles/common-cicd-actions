@@ -1,9 +1,25 @@
 name: Setup Reviewdog
 inputs:
+  use_ruby:
+    required: false
+    default: false
+    type: boolean
+  use_node:
+    required: false
+    default: false
+    type: boolean
+  use_go:
+    required: false
+    default: false
+    type: boolean
   github_token:
     required: true
     default: ""
     type: string
+  test_ci_mode:
+    required: false
+    default: false
+    type: boolean
 runs:
   using: "composite"
   steps:
@@ -23,6 +39,7 @@ runs:
     #     github_token: ${{ inputs.github_token }}
     #     fail_on_error: true
     - name: Setup reviewdog/brakeman
+      if: ${{ inputs.use_ruby == true && inputs.test_ci_mode == false }}
       uses: reviewdog/action-brakeman@v2
       with:
         brakeman_version: 4.8.2

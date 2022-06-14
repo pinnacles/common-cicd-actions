@@ -16,6 +16,7 @@ jobs:
       node_package_manager: ""
       use_go: false
       go_version: ""
+      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -29,6 +30,7 @@ jobs:
       node_package_manager: "yarn"
       use_go: false
       go_version: ""
+      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -42,6 +44,7 @@ jobs:
       node_package_manager: ""
       use_go: true
       go_version: 1.17.6
+      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -55,6 +58,7 @@ jobs:
       node_package_manager: "yarn"
       use_go: false
       go_version: ""
+      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -69,5 +73,6 @@ jobs:
       use_go: false
       go_version: ""
       test_in_parallel: true
+      test_ci_mode: true
     secrets:
       github_pat: dummy

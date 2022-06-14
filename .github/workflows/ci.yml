@@ -48,6 +48,11 @@ on:
         required: false
         default: false
         type: boolean
+      test_ci_mode:
+        description: 'whether test_ci or not'
+        required: false
+        default: false
+        type: boolean
     secrets:
       github_pat:
         description: 'Personal Access Token of bot user'
@@ -86,7 +91,11 @@ jobs:
           go_version: ${{ inputs.go_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@v0.2.16
         with:
+          use_ruby: ${{ inputs.use_ruby }}
+          use_node: ${{ inputs.use_node }}
+          use_go: ${{ inputs.use_go }}
           github_token: ${{ secrets.github_pat }}
+          test_ci_mode: ${{ inputs.test_ci_mode }}
       - run: make lint
         env:
           ACTION_TYPE: CI
