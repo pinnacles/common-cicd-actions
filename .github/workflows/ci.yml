@@ -48,6 +48,11 @@ on:
         required: false
         default: false
         type: boolean
+      test_ci_mode:
+        description: 'whether test_ci or not'
+        required: false
+        default: false
+        type: boolean
     secrets:
       github_pat:
         description: 'Personal Access Token of bot user'
