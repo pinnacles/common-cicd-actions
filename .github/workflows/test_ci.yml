@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-ci-ruby:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@shibukk/patch-reviewdog
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
@@ -21,7 +21,7 @@ jobs:
       github_pat: dummy
 
   test-ci-node:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@shibukk/patch-reviewdog
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: false
       ruby_version: ""
@@ -35,7 +35,7 @@ jobs:
       github_pat: dummy
 
   test-ci-go:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@shibukk/patch-reviewdog
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: false
       ruby_version: ""
@@ -49,7 +49,7 @@ jobs:
       github_pat: dummy
 
   test-ci-ruby-and-node:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@shibukk/patch-reviewdog
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
@@ -63,7 +63,7 @@ jobs:
       github_pat: dummy
 
   test-ci-test-in-parallel:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@shibukk/patch-reviewdog
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
