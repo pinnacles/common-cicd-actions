@@ -42,7 +42,6 @@ runs:
       if: ${{ inputs.use_ruby == true && inputs.test_ci_mode == false }}
       uses: reviewdog/action-brakeman@v2
       with:
-        brakeman_version: 4.8.2
         reporter: github-pr-review
         github_token: ${{ inputs.github_token }}
         fail_on_error: true
