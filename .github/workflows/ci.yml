@@ -84,7 +84,7 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@v0.2.16
+      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog@shibukk/patch-reviewdog
         with:
           use_ruby: ${{ inputs.use_ruby }}
           use_node: ${{ inputs.use_node }}
