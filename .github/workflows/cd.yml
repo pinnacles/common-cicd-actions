@@ -139,4 +139,3 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-          GITHUB_PR_URL: ${{ github.event.pull_request.html_url }}
