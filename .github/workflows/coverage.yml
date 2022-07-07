@@ -1,4 +1,4 @@
-name: Common CI reusable workflow
+name: Common Coverage reusable workflow
 
 on:
   workflow_call:
