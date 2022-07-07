@@ -1,0 +1,173 @@
+name: Common CI reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      use_ruby:
+        description: "whether use ruby or not"
+        required: false
+        default: false
+        type: boolean
+      ruby_version:
+        description: "ruby version"
+        required: false
+        type: string
+      use_node:
+        description: "whether use node or not"
+        required: false
+        default: false
+        type: boolean
+      node_version:
+        description: "node version"
+        required: false
+        type: string
+      node_package_manager:
+        description: "node package manager name"
+        required: false
+        type: string
+      use_go:
+        description: "whether use go or not"
+        required: false
+        default: false
+        type: boolean
+      go_version:
+        description: "go version"
+        required: false
+        type: string
+      mysql_version:
+        description: "mysql version"
+        required: false
+        type: string
+    secrets:
+      github_pat:
+        description: "Personal Access Token of bot user"
+        required: false
+
+jobs:
+  dependency-resolution:
+    name: resolve dependencies
+    runs-on: ubuntu-latest
+    outputs:
+      pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
+      allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - name: store pull request number with output parameter
+        run: echo "::set-output name=pull_request_number::$(gh pr view --json number -q .number || echo "")"
+        id: pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
+
+  test:
+    name: execute `make test`
+    needs: dependency-resolution
+    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    outputs:
+      allow_simplecov_action: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
+      pull_request_number: ${{ needs.dependency-resolution.outputs.pull_request_number }}
+    services:
+      db:
+        image: mysql:${{ inputs.mysql_version }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    strategy:
+      fail-fast: false
+      matrix:
+        node_count: [12]
+        node_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: report-${{ github.head_ref }}
+          path: report-${{ github.head_ref }}
+        continue-on-error: true
+      - run: |
+          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          chmod +x split-test
+      - run: make test
+        env:
+          ACTION_TYPE: CI
+          RUBY_VERSION: ${{ inputs.ruby_version }}
+          NODE_VERSION: ${{ inputs.node_version }}
+          GO_VERSION: ${{ inputs.go_version }}
+          NODE_COUNT: ${{ matrix.node_count }}
+          NODE_INDEX: ${{ matrix.node_index }}
+          JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
+          JUNIT_REPORT_DIR_NEW: report
+          GITHUB_TOKEN: ${{ secrets.github_pat }}
+          COVERAGE: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
+      - name: move coverage report
+        if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
+        run: mv coverage/.resultset.json coverage/.resultset-${{ matrix.node_index }}.json
+      - name: stash simplecov coverage results
+        if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: tmp-coverage-report
+          path: coverage
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v2
+        with:
+          name: report-${{ github.sha }}
+          path: report
+          if-no-files-found: error
+
+  simplecov-report-action:
+    name: merge and store coverage
+    needs: [test]
+    if: ${{ success() && needs.test.outputs.allow_simplecov_action == 'true' }}
+    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
+          use_node: ${{ inputs.use_node }}
+          node_version: ${{ inputs.node_version }}
+          node_package_manager: ${{ inputs.node_package_manager }}
+          use_go: ${{ inputs.use_go }}
+          go_version: ${{ inputs.go_version }}
+      - uses: actions/download-artifact@v2
+        with:
+          name: tmp-coverage-report
+          path: coverage
+      - run: bundle exec rake coverage:report
+      - uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: |
+            coverage/assets/
+            coverage/coverage.json
+            coverage/index.html
+          if-no-files-found: error
+      - uses: geekyeggo/delete-artifact@v1
+        with:
+          name: tmp-coverage-report
+          failOnError: true
