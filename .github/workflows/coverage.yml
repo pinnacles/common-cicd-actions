@@ -138,7 +138,7 @@ jobs:
           path: report
           if-no-files-found: error
 
-  simplecov-report-action:
+  store-simplecov-report:
     name: merge and store coverage
     needs: [test]
     if: ${{ success() && needs.test.outputs.allow_simplecov_action == 'true' }}
