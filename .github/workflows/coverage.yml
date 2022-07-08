@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
-      allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
+      allow_simplecov_action: ${{ github.ref_name == 'fukumone/test_simple_cov_base' || steps.pr.outputs.pull_request_number != '' }}
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
