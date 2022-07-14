@@ -191,11 +191,7 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - uses: actions/download-artifact@v2
-        with:
-          name: report-${{ github.head_ref }}
-          path: report-${{ github.head_ref }}
-        continue-on-error: true
+      - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
       - run: |
           curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
           chmod +x split-test
@@ -207,14 +203,9 @@ jobs:
           GO_VERSION: ${{ inputs.go_version }}
           NODE_COUNT: ${{ matrix.node_count }}
           NODE_INDEX: ${{ matrix.node_index }}
-          JUNIT_REPORT_DIR_OLD: report-${{ github.head_ref }}
-          JUNIT_REPORT_DIR_NEW: report
+          JUNIT_REPORT_DIR_OLD: old-rspec-reports
+          JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: report-${{ github.sha }}
-          path: report
-          if-no-files-found: error
 
   test-in-parallel-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
@@ -252,12 +243,7 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - uses: actions/download-artifact@v2
-        with:
-          name: report-e6d95c62e6058ed3154e8740f7ab2e8a1cc54b52
-          path: report-e6d95c62e6058ed3154e8740f7ab2e8a1cc54b52
-        continue-on-error: true
-      - run: make test
+      - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
       - run: |
           curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
           chmod +x split-test
@@ -269,11 +255,11 @@ jobs:
           GO_VERSION: ${{ inputs.go_version }}
           NODE_COUNT: ${{ matrix.node_count }}
           NODE_INDEX: ${{ matrix.node_index }}
-          JUNIT_REPORT_DIR_OLD: report-e6d95c62e6058ed3154e8740f7ab2e8a1cc54b52
-          JUNIT_REPORT_DIR_NEW: report
+          JUNIT_REPORT_DIR_OLD: old-rspec-reports
+          JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
-      - name: move coverage report
+      - name: rename coverage report
         if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
         run: mv coverage/.resultset.json coverage/.resultset-${{ matrix.node_index }}.json
       - name: stash simplecov coverage results
@@ -283,15 +269,10 @@ jobs:
           name: tmp-coverage-report
           path: coverage
           if-no-files-found: error
-      - uses: actions/upload-artifact@v2
-        with:
-          name: report-${{ github.sha }}
-          path: report
-          if-no-files-found: error
 
   simplecov-report-action:
     name: merge and check coverage
-    needs: [test-in-parallel-with-mysql]
+    needs: test-in-parallel-with-mysql
     if: ${{ success() && needs.test-in-parallel-with-mysql.outputs.allow_simplecov_action == 'true' }}
     runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
     steps:
@@ -318,7 +299,8 @@ jobs:
             coverage/coverage.json
             coverage/index.html
           if-no-files-found: error
-      - uses: geekyeggo/delete-artifact@v1
+      - name: delete tmp-coverage-report
+        uses: geekyeggo/delete-artifact@v1
         with:
           name: tmp-coverage-report
           failOnError: true
