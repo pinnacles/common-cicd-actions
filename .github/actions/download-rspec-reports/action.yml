@@ -1,0 +1,12 @@
+name: Download Rspec Reports
+runs:
+  using: "composite"
+  steps:
+    - name: download rspec-reports from different workflows
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        branch: master
+        name: rspec-reports
+        workflow: report.yml
+        path: old-rspec-reports
+      continue-on-error: true
