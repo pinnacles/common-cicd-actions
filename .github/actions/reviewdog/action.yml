@@ -30,14 +30,14 @@ runs:
     #     reporter: github-pr-review
     #     github_token: ${{ inputs.github_token }}
     #     fail_on_error: true
-    # - name: Setup reviewdog/rubocop
-    #   uses: reviewdog/action-rubocop@v2
-    #   with:
-    #     rubocop_version: gemfile
-    #     rubocop_extensions: rubocop-rails:gemfile rubocop-rspec:gemfile rubocop-performance:gemfile
-    #     reporter: github-pr-review
-    #     github_token: ${{ inputs.github_token }}
-    #     fail_on_error: true
+    - name: Setup reviewdog/rubocop
+      uses: reviewdog/action-rubocop@v2
+      with:
+        rubocop_version: gemfile
+        rubocop_extensions: rubocop-rails:gemfile rubocop-rspec:gemfile rubocop-performance:gemfile
+        reporter: github-pr-review
+        github_token: ${{ inputs.github_token }}
+        fail_on_error: true
     - name: Setup reviewdog/brakeman
       if: ${{ inputs.use_ruby == true && inputs.test_ci_mode == false }}
       uses: reviewdog/action-brakeman@v2
