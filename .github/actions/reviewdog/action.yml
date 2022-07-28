@@ -1,25 +1,9 @@
 name: Setup Reviewdog
 inputs:
-  use_ruby:
-    required: false
-    default: false
-    type: boolean
-  use_node:
-    required: false
-    default: false
-    type: boolean
-  use_go:
-    required: false
-    default: false
-    type: boolean
   github_token:
     required: true
     default: ""
     type: string
-  test_ci_mode:
-    required: false
-    default: false
-    type: boolean
 runs:
   using: "composite"
   steps:
@@ -27,21 +11,25 @@ runs:
     #   uses: reviewdog/action-eslint@v1
     #   with:
     #     eslint_flags: 'frontend/'
-    #     reporter: github-pr-review
+    #     reporter: github-check
     #     github_token: ${{ inputs.github_token }}
-    #     fail_on_error: true
+    #     fail_on_error: false
     - name: Setup reviewdog/rubocop
       uses: reviewdog/action-rubocop@v2
       with:
         rubocop_version: gemfile
         rubocop_extensions: rubocop-rails:gemfile rubocop-rspec:gemfile rubocop-performance:gemfile
-        reporter: github-pr-review
+        reporter: github-check
         github_token: ${{ inputs.github_token }}
-        fail_on_error: true
+        # fail_on_error: false
+        # level: warning
+      continue-on-error: true
     - name: Setup reviewdog/brakeman
-      if: ${{ inputs.use_ruby == true && inputs.test_ci_mode == false }}
       uses: reviewdog/action-brakeman@v2
       with:
-        reporter: github-pr-review
+        reporter: github-check
         github_token: ${{ inputs.github_token }}
-        fail_on_error: true
+        # fail_on_error: false
+        # level: warning
+      continue-on-error: true
+# .rubocop.yml
