@@ -131,6 +131,9 @@ jobs:
     name: execute `make post-process`
     needs: [build-and-push]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v2
         with:
