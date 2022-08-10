@@ -96,7 +96,7 @@ jobs:
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - name: Configure AWS Credentials
-        uses: pinnacles/common-cicd-actions/.github/actions/aws-oidc-auth@v0.1.0
+        uses: pinnacles/common-cicd-actions/.github/actions/aws-oidc-auth@v0.7.1
         with:
           aws-region: ${{ secrets.aws_region }}
           role-to-assume: ${{ secrets.aws_iam_role }}
@@ -131,12 +131,15 @@ jobs:
     name: execute `make post-process`
     needs: [build-and-push]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
       - name: Configure AWS Credentials
-        uses: pinnacles/common-cicd-actions/.github/actions/aws-oidc-auth@v0.1.0
+        uses: pinnacles/common-cicd-actions/.github/actions/aws-oidc-auth@v0.7.1
         with:
           aws-region: ${{ secrets.aws_region }}
           role-to-assume: ${{ secrets.aws_iam_role }}
