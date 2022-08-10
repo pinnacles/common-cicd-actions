@@ -135,6 +135,10 @@ jobs:
       contents: write
       id-token: write
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        id: extract_branch
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
@@ -150,3 +154,4 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
           IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          BRANCH_NAME: ${{ steps.extract_branch.outputs.branch }}
