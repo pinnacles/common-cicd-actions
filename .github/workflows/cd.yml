@@ -133,6 +133,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Configure AWS Credentials
+        uses: pinnacles/common-cicd-actions/.github/actions/aws-oidc-auth@v0.1.0
+        with:
+          aws-region: ${{ secrets.aws_region }}
+          role-to-assume: ${{ secrets.aws_iam_role }}
+          role-session-name: session-name-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
       - run: make post-process
         env:
           ACTION_TYPE: CD
