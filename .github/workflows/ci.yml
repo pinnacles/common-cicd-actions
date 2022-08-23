@@ -178,8 +178,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_count: [12]
-        node_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        node_count: [8]
+        node_index: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
@@ -230,8 +230,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_count: [12]
-        node_index: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        node_count: [8]
+        node_index: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
