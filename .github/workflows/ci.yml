@@ -66,7 +66,7 @@ jobs:
       pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
       allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -86,7 +86,7 @@ jobs:
     needs: dependency-resolution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -116,7 +116,7 @@ jobs:
     needs: dependency-resolution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -151,7 +151,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -181,7 +181,7 @@ jobs:
         node_count: [8]
         node_index: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -233,7 +233,7 @@ jobs:
         node_count: [8]
         node_index: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -276,7 +276,7 @@ jobs:
     if: ${{ success() && needs.test-in-parallel-with-mysql.outputs.allow_simplecov_action == 'true' }}
     runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -317,7 +317,7 @@ jobs:
     needs: dependency-resolution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -348,7 +348,7 @@ jobs:
     if: ${{ ! failure() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make post-process
         env:
           ACTION_TYPE: CI
