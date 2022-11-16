@@ -3,6 +3,15 @@ name: Common reviewdog reusable workflow for Rails project
 on:
   workflow_call:
     inputs:
+      use_ruby:
+        description: "whether use ruby or not"
+        required: false
+        default: false
+        type: boolean
+      ruby_version:
+        description: "ruby version"
+        required: false
+        type: string
       use_rubocop:
         description: 'whether use rubocop or not'
         required: false
@@ -24,6 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+        with:
+          use_ruby: ${{ inputs.use_ruby }}
+          ruby_version: ${{ inputs.ruby_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog/rails@v0.8.2
         with:
           use_rubocop: ${{ inputs.use_rubocop }}
