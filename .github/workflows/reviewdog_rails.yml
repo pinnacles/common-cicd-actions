@@ -11,7 +11,8 @@ on:
       use_brakeman:
         description: 'whether use brakeman or not'
         required: false
-        type: string
+        default: false
+        type: boolean
     secrets:
       github_pat:
         description: 'Personal Access Token of bot user'
