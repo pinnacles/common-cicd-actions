@@ -16,7 +16,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup reviewdog/rubocop
-      if: ${{ inputs.use_rubocop == true }}
+      if: ${{ inputs.use_rubocop == 'true' }}
       uses: reviewdog/action-rubocop@v2
       with:
         github_token: ${{ inputs.github_token }}
@@ -25,7 +25,7 @@ runs:
         reporter: github-pr-review
         fail_on_error: true
     - name: Setup reviewdog/brakeman
-      if: ${{ inputs.use_brakeman == true }}
+      if: ${{ inputs.use_brakeman == 'true' }}
       uses: reviewdog/action-brakeman@v2
       with:
         github_token: ${{ inputs.github_token }}
