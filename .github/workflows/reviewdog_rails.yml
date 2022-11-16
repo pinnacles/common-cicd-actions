@@ -37,7 +37,7 @@ jobs:
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
-      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog/rails@v0.8.2
+      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog/rails@v0.8.3
         with:
           use_rubocop: ${{ inputs.use_rubocop }}
           use_brakeman: ${{ inputs.use_brakeman }}
