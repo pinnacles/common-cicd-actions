@@ -1,0 +1,30 @@
+name: Common reviewdog reusable workflow for Rails project
+
+on:
+  workflow_call:
+    inputs:
+      use_rubocop:
+        description: 'whether use rubocop or not'
+        required: false
+        default: false
+        type: boolean
+      use_brakeman:
+        description: 'whether use brakeman or not'
+        required: false
+        type: string
+    secrets:
+      github_pat:
+        description: 'Personal Access Token of bot user'
+        required: false
+
+jobs:
+  review:
+    name: review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog/rails@v0.6.0
+        with:
+          use_rubocop: ${{ inputs.use_rubocop }}
+          use_brakeman: ${{ inputs.use_brakeman }}
+          github_token: ${{ secrets.github_pat }}

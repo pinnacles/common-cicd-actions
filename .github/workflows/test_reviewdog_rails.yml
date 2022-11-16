@@ -1,0 +1,15 @@
+name: Test reviewdog_rails.yml
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test-reviewdog-rails:
+    uses: pinnacles/common-cicd-actions/.github/workflows/reviewdog_rails.yml@main
+    with:
+      use_rubocop: true
+      use_brakeman: true
+    secrets:
+      github_pat: dummy
