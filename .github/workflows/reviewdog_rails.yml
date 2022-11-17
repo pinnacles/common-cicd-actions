@@ -3,11 +3,6 @@ name: Common reviewdog reusable workflow for Rails project
 on:
   workflow_call:
     inputs:
-      use_ruby:
-        description: "whether use ruby or not"
-        required: false
-        default: false
-        type: boolean
       ruby_version:
         description: "ruby version"
         required: false
@@ -35,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
-          use_ruby: ${{ inputs.use_ruby }}
+          use_ruby: true
           ruby_version: ${{ inputs.ruby_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog/rails@v0.8.3
         with:
