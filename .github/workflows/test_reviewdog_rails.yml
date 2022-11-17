@@ -14,4 +14,4 @@ jobs:
       use_rubocop: true
       use_brakeman: true
     secrets:
-      github_pat: dummy
+      github_pat: ${{ secrets.GITHUB_TOKEN }}
