@@ -107,7 +107,7 @@ jobs:
           RUBY_VERSION: ${{ inputs.ruby_version }}
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
-          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == false }}
@@ -132,7 +132,7 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
@@ -170,7 +170,7 @@ jobs:
           GO_VERSION: ${{ inputs.go_version }}
           MYSQL_VERSION: ${{ inputs.mysql_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test-in-parallel:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == true }}
@@ -208,7 +208,7 @@ jobs:
           JUNIT_REPORT_DIR_OLD: old-rspec-reports
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test-in-parallel-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
@@ -262,7 +262,7 @@ jobs:
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
-          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
       - name: rename coverage report
         if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
         run: mv coverage/.resultset.json coverage/.resultset-${{ matrix.node_index }}.json
