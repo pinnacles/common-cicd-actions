@@ -63,7 +63,7 @@ jobs:
     name: resolve dependencies
     runs-on: ubuntu-latest
     outputs:
-      all_changed_files: ${{ steps.changed-files.outputs.all_changed_files }}
+      all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
       pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
       allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
     steps:
