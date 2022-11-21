@@ -63,10 +63,14 @@ jobs:
     name: resolve dependencies
     runs-on: ubuntu-latest
     outputs:
+      all_changed_files: ${{ steps.changed-files.outputs.all_changed_files }}
       pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
       allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
     steps:
       - uses: actions/checkout@v2
+      - name: get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v1.1.2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -81,6 +85,7 @@ jobs:
         id: pr
         env:
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+
   lint:
     name: execute `make lint`
     needs: dependency-resolution
@@ -102,6 +107,7 @@ jobs:
           RUBY_VERSION: ${{ inputs.ruby_version }}
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
+          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == false }}
@@ -126,6 +132,8 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
+
   test-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
     name: execute `make test`
@@ -162,6 +170,7 @@ jobs:
           GO_VERSION: ${{ inputs.go_version }}
           MYSQL_VERSION: ${{ inputs.mysql_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test-in-parallel:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == true }}
@@ -199,6 +208,7 @@ jobs:
           JUNIT_REPORT_DIR_OLD: old-rspec-reports
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   test-in-parallel-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
@@ -252,6 +262,7 @@ jobs:
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
+          ALL_CHANGED_FILES" ${{ needs.dependency-resolution.outputs.all_changed_files }}
       - name: rename coverage report
         if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
         run: mv coverage/.resultset.json coverage/.resultset-${{ matrix.node_index }}.json
