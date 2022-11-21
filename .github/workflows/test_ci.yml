@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-ci-ruby:
-    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@add-test
+    uses: pinnacles/common-cicd-actions/.github/workflows/ci.yml@main
     with:
       use_ruby: true
       ruby_version: 3.1.0
