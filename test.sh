@@ -35,3 +35,10 @@ fi
 if [ -n "${GITHUB_TOKEN}" ]; then
 	test "${GITHUB_TOKEN}" = dummy
 fi
+
+if [ -z "${ALL_CHANGED_FILES}" ]; then
+	echo "ALL_CHANGED_FILES: ${ALL_CHANGED_FILES}"
+	exit 1
+else
+	echo "ALL_CHANGED_FILES: ${ALL_CHANGED_FILES}"
+fi
