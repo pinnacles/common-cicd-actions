@@ -337,6 +337,7 @@ jobs:
           RUBY_VERSION: ${{ inputs.ruby_version }}
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
+          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
 
   post-process:
     name: execute `make post-process`
