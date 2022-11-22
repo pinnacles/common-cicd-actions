@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-reviewdog-rails:
-    uses: pinnacles/common-cicd-actions/.github/workflows/reviewdog_rails.yml@main
+    uses: ./.github/workflows/reviewdog_rails.yml
     with:
       ruby_version: 3.1.0
       use_rubocop: true
