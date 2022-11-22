@@ -1,0 +1,39 @@
+name: Common reviewdog reusable workflow for JS project
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: "node version"
+        required: false
+        type: string
+      use_eslint:
+        description: 'whether use eslint or not'
+        required: false
+        default: false
+        type: boolean
+      eslint_flags:
+        description: 'eslint flag like "src/"'
+        required: false
+        default: 'src/'
+        type: string
+    secrets:
+      github_pat:
+        description: 'Personal Access Token of bot user'
+        required: false
+
+jobs:
+  review:
+    name: reviewdog for JS
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+        with:
+          use_node: true
+          node_version: ${{ inputs.node_version }}
+      - uses: pinnacles/common-cicd-actions/.github/actions/reviewdog/js@v0.10.0
+        with:
+          use_eslint: ${{ inputs.use_eslint }}
+          eslint_flags: ${{ inputs.eslint_flags }}
+          github_token: ${{ secrets.github_pat }}
