@@ -1,0 +1,25 @@
+name: Setup Reviewdog for JS
+inputs:
+  use_eslint:
+    required: false
+    default: false
+    type: boolean
+  eslint_flags:
+    required: false
+    default: "src/"
+    type: string
+  github_token:
+    required: true
+    default: ""
+    type: string
+runs:
+  using: "composite"
+  steps:
+    - name: Setup reviewdog/eslint
+      if: ${{ inputs.use_eslint == 'true' }}
+      uses: reviewdog/action-eslint@v1
+      with:
+        github_token: ${{ inputs.github_token }}
+        reporter: github-pr-review
+        eslint_flags: ${{ inputs.eslint_flags }}
+        fail_on_error: true
