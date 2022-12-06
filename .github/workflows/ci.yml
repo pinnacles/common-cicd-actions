@@ -301,7 +301,7 @@ jobs:
           if-no-files-found: warn
 
   simplecov-report-action:
-    if: ${{ success() && inputs.use_simplecov_report == true }}
+    if: ${{ inputs.use_simplecov_report == true && (always() && contains(needs.*.result, 'success') && !(contains(needs.*.result, 'failure'))) }}
     name: report simplecov coverage
     needs: [
       test,
