@@ -71,3 +71,19 @@ jobs:
       test_in_parallel: true
     secrets:
       github_pat: dummy
+
+  test-ci-test-in-parallel-with-simplecov:
+    uses: ./.github/workflows/ci.yml
+    with:
+      use_ruby: true
+      ruby_version: 3.1.0
+      use_node: false
+      node_version: ""
+      node_package_manager: ""
+      use_go: false
+      go_version: ""
+      test_in_parallel: true
+      use_simplecov_report: true
+      simplecov_command: "make simplecov"
+    secrets:
+      github_pat: dummy

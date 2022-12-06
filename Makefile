@@ -23,3 +23,6 @@ build: ## executes build step
 
 post-process: ## executes post-process step
 	@echo "target: post-process" && ./test.sh
+
+simplecov:
+	@echo "execute simplecov"
