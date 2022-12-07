@@ -308,7 +308,7 @@ jobs:
         with:
           name: tmp-coverage-report
           failOnError: true
-      - uses: pinnacles/simplecov-report-action@main
+      - uses: pinnacles/simplecov-report-action@v1.5.0
         if: ${{ needs.test-in-parallel-with-mysql.outputs.pull_request_number != '' }}
         with:
           token: ${{ secrets.github_pat }}
