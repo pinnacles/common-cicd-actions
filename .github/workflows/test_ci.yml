@@ -84,6 +84,7 @@ jobs:
       go_version: ""
       test_in_parallel: true
       use_simplecov_report: true
+      simplecov_report_path: test/coverage.json
       simplecov_command: "make simplecov"
     secrets:
       github_pat: dummy

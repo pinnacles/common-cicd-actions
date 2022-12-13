@@ -304,6 +304,7 @@ jobs:
     if: ${{ inputs.use_simplecov_report == true && (always() && contains(needs.*.result, 'success') && !(contains(needs.*.result, 'failure'))) }}
     name: report simplecov coverage
     needs: [
+      dependency-resolution,
       test,
       test-with-mysql,
       test-in-parallel,
@@ -333,11 +334,29 @@ jobs:
         with:
           name: coverage-report-${{ github.run_id }}
           failOnError: false
-      - uses: pinnacles/simplecov-report-action@main
+      - name: download head of baseRef coverage report
+        uses: dawidd6/action-download-artifact@v2
         with:
+          branch: ${{ github.base_ref }}
+          name: coverage-head
+          workflow: report.yml
+          path: baseref_coverage
+        continue-on-error: true
+      - name: download specific sha of baseRef coverage report if its exist
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          branch: ${{ github.base_ref }}
+          name: coverage-${{ needs.dependency-resolution.outputs.base_ref_hash }}
+          workflow: report.yml
+          path: baseref_coverage
+        continue-on-error: true
+      - uses: pinnacles/simplecov-report-action@v1.6.1
+        with:
+          headRefCoveragePath: ${{ inputs.simplecov_report_path }}/coverage.json
+          baseRefCoveragePath: baseref_coverage/coverage.json
           token: ${{ secrets.github_pat }}
-          head_branch: ${{ github.base_ref }}
-          base_ref_hash: ${{ needs.devendency-resolution.outputs.base_ref_hash }}
+          base_branch: ${{ github.base_ref }}
+        continue-on-error: true
 
   build:
     name: execute `make build`
