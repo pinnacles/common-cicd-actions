@@ -147,7 +147,7 @@ jobs:
           ruby_version: ${{ inputs.ruby_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
       - run: |
-          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          curl -L -o split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
           chmod +x split-test
       - run: make test
         env:
@@ -204,7 +204,7 @@ jobs:
           ruby_version: ${{ inputs.ruby_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
       - run: |
-          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          curl -L -o split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
           chmod +x split-test
       - run: make test
         env:
