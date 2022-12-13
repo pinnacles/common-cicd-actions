@@ -354,7 +354,7 @@ jobs:
         with:
           headRefCoveragePath: ${{ inputs.simplecov_report_path }}/coverage.json
           baseRefCoveragePath: baseref_coverage/coverage.json
-          token: ${{ secrets.github_pat }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           baseBranch: ${{ github.base_ref }}
         continue-on-error: true
 
