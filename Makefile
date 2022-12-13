@@ -26,3 +26,5 @@ post-process: ## executes post-process step
 
 simplecov:
 	@echo "execute simplecov"
+	mkdir baseref_coverage
+	cp test/increaseCoverage.json baseref_coverage/coverage.json
