@@ -31,6 +31,11 @@ on:
         required: false
         default: coverage
         type: string
+      simplecov_command:
+        description: "execute simplecov command"
+        required: false
+        default: "bundle exec rake coverage:report"
+        type: string
     secrets:
       github_pat:
         description: "Personal Access Token of bot user"
@@ -252,7 +257,7 @@ jobs:
           name: coverage-report-${{ github.run_id }}
           path: coverage
         continue-on-error: true
-      - run: bundle exec rake coverage:report
+      - run: ${{ inputs.simplecov_command }}
       - uses: actions/upload-artifact@v2
         with:
           name: coverage-head
