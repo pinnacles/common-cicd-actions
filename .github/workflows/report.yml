@@ -45,15 +45,8 @@ jobs:
   dependency-resolution:
     name: resolve dependencies
     runs-on: ubuntu-latest
-    outputs:
-      all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
     steps:
       - uses: actions/checkout@v2
-      - name: get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v1.1.2
-        with:
-          fetch-depth: 2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: 'true'
@@ -76,7 +69,7 @@ jobs:
           RUBY_VERSION: ${{ inputs.ruby_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ inputs.use_simplecov_report }}
-          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          FORCE_TEST: true
       - name: upload coverage report
         if: ${{ inputs.use_simplecov_report == true }}
         uses: actions/upload-artifact@v2
@@ -121,7 +114,7 @@ jobs:
           MYSQL_VERSION: ${{ inputs.mysql_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ inputs.use_simplecov_report }}
-          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          FORCE_TEST: true
       - name: upload coverage report
         if: ${{ inputs.use_simplecov_report == true }}
         uses: actions/upload-artifact@v2
@@ -166,7 +159,7 @@ jobs:
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ inputs.use_simplecov_report }}
-          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          FORCE_TEST: true
       - name: upload coverage report
         if: ${{ inputs.use_simplecov_report == true }}
         uses: actions/upload-artifact@v2
@@ -223,7 +216,7 @@ jobs:
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
           COVERAGE: ${{ inputs.use_simplecov_report }}
-          ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+          FORCE_TEST: true
       - name: upload coverage report
         if: ${{ inputs.use_simplecov_report == true }}
         uses: actions/upload-artifact@v2
