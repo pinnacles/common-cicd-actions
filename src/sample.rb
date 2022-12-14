@@ -1,0 +1,3 @@
+#!/bin/ruby
+
+p "Hello"
