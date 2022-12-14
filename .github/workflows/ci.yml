@@ -77,7 +77,12 @@ jobs:
       all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
       base_ref_hash: #{{ steps.hash.outputs.base_ref_hash }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: store base_ref hash with output parameter
+        run: echo "::set-output name=bash_ref_hash::$(git show-branch --merge-base --sha1-name ${{ github.base_ref }} ${{ github.head_ref }} || echo "")"
+        id: hash
       - name: get changed files
         id: changed-files
         uses: tj-actions/changed-files@v1.1.2
@@ -90,9 +95,6 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - name: store base_ref hash with output parameter
-        run: echo "::set-output name=bash_ref_hash::$(git show-branch --merge-base --sha1-name ${{ github.base_ref }} ${{ github.head_ref }} || echo "")"
-        id: hash
 
   lint:
     name: execute `make lint`
