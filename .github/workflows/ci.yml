@@ -48,11 +48,21 @@ on:
         required: false
         default: false
         type: boolean
-      test_ci_mode:
-        description: "whether test_ci or not"
+      use_simplecov_report:
+        description: "whether use simplecov or not"
         required: false
         default: false
         type: boolean
+      simplecov_report_path:
+        description: "path to coverage report"
+        required: false
+        default: coverage
+        type: string
+      simplecov_command:
+        description: "execute simplecov command"
+        required: false
+        default: "bundle exec rake coverage:report"
+        type: string
     secrets:
       github_pat:
         description: "Personal Access Token of bot user"
@@ -60,14 +70,20 @@ on:
 
 jobs:
   dependency-resolution:
+    if: ${{ github.event_name == 'pull_request' }}
     name: resolve dependencies
     runs-on: ubuntu-latest
     outputs:
       all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
-      pull_request_number: ${{ steps.pr.outputs.pull_request_number }}
-      allow_simplecov_action: ${{ github.ref_name == 'master' || steps.pr.outputs.pull_request_number != '' }}
+      base_ref_hash: ${{ steps.hash.outputs.base_ref_hash }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: store base_ref hash with output parameter
+        run: |
+          echo "::set-output name=base_ref_hash::$(git show-branch --merge-base origin/${{ github.base_ref }} origin/${{ github.head_ref }} || echo "")"
+        id: hash
       - name: get changed files
         id: changed-files
         uses: tj-actions/changed-files@v1.1.2
@@ -80,11 +96,6 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - name: store pull request number with output parameter
-        run: echo "::set-output name=pull_request_number::$(gh pr view --json number -q .number || echo "")"
-        id: pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_pat }}
 
   lint:
     name: execute `make lint`
@@ -132,7 +143,15 @@ jobs:
           NODE_VERSION: ${{ inputs.node_version }}
           GO_VERSION: ${{ inputs.go_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          COVERAGE: ${{ inputs.use_simplecov_report }}
           ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+      - name: upload coverage report
+        if: ${{ inputs.use_simplecov_report == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report-${{ github.run_id }}
+          path: ${{ inputs.simplecov_report_path }}
+          if-no-files-found: warn
 
   test-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
@@ -170,7 +189,15 @@ jobs:
           GO_VERSION: ${{ inputs.go_version }}
           MYSQL_VERSION: ${{ inputs.mysql_version }}
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          COVERAGE: ${{ inputs.use_simplecov_report }}
           ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+      - name: upload coverage report
+        if: ${{ inputs.use_simplecov_report == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report-${{ github.run_id }}
+          path: ${{ inputs.simplecov_report_path }}
+          if-no-files-found: warn
 
   test-in-parallel:
     if: ${{ inputs.use_mysql == false && inputs.test_in_parallel == true }}
@@ -195,7 +222,7 @@ jobs:
           go_version: ${{ inputs.go_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
       - run: |
-          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          curl -L -o split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
           chmod +x split-test
       - run: make test
         env:
@@ -208,16 +235,21 @@ jobs:
           JUNIT_REPORT_DIR_OLD: old-rspec-reports
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
+          COVERAGE: ${{ inputs.use_simplecov_report }}
           ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
+      - name: upload coverage report
+        if: ${{ inputs.use_simplecov_report == true }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report-${{ github.run_id }}
+          path: ${{ inputs.simplecov_report_path }}
+          if-no-files-found: warn
 
   test-in-parallel-with-mysql:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
     name: execute `make test`
     needs: dependency-resolution
     runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
-    outputs:
-      allow_simplecov_action: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
-      pull_request_number: ${{ needs.dependency-resolution.outputs.pull_request_number }}
     services:
       db:
         image: mysql:${{ inputs.mysql_version }}
@@ -248,7 +280,7 @@ jobs:
           go_version: ${{ inputs.go_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
       - run: |
-          curl -L --out split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
+          curl -L -o split-test https://github.com/mtsmfm/split-test/releases/download/v1.0.0/split-test-x86_64-unknown-linux-gnu
           chmod +x split-test
       - run: make test
         env:
@@ -261,23 +293,26 @@ jobs:
           JUNIT_REPORT_DIR_OLD: old-rspec-reports
           JUNIT_REPORT_DIR_NEW: rspec-reports
           GITHUB_TOKEN: ${{ secrets.github_pat }}
-          COVERAGE: ${{ needs.dependency-resolution.outputs.allow_simplecov_action }}
+          COVERAGE: ${{ inputs.use_simplecov_report }}
           ALL_CHANGED_FILES: ${{ needs.dependency-resolution.outputs.all_changed_files }}
-      - name: rename coverage report
-        if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
-        run: mv coverage/.resultset.json coverage/.resultset-${{ matrix.node_index }}.json
-      - name: stash simplecov coverage results
-        if: ${{ needs.dependency-resolution.outputs.allow_simplecov_action == 'true' }}
+      - name: upload coverage report
+        if: ${{ inputs.use_simplecov_report == true }}
         uses: actions/upload-artifact@v2
         with:
-          name: tmp-coverage-report
-          path: coverage
-          if-no-files-found: error
+          name: coverage-report-${{ github.run_id }}
+          path: ${{ inputs.simplecov_report_path }}
+          if-no-files-found: warn
 
   simplecov-report-action:
-    name: merge and check coverage
-    needs: test-in-parallel-with-mysql
-    if: ${{ success() && needs.test-in-parallel-with-mysql.outputs.allow_simplecov_action == 'true' }}
+    if: ${{ inputs.use_simplecov_report == true && (always() && contains(needs.*.result, 'success') && !(contains(needs.*.result, 'failure'))) }}
+    name: report simplecov coverage
+    needs: [
+      dependency-resolution,
+      test,
+      test-with-mysql,
+      test-in-parallel,
+      test-in-parallel-with-mysql,
+    ]
     runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
     steps:
       - uses: actions/checkout@v2
@@ -290,31 +325,41 @@ jobs:
           node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
-      - uses: actions/download-artifact@v2
+      - name: download coverage report
+        uses: actions/download-artifact@v2
         with:
-          name: tmp-coverage-report
-          path: coverage
-      - run: bundle exec rake coverage:report
-      - uses: actions/upload-artifact@v2
-        with:
-          name: coverage
-          path: |
-            coverage/assets/
-            coverage/coverage.json
-            coverage/index.html
-          if-no-files-found: error
-      - name: delete tmp-coverage-report
+          name: coverage-report-${{ github.run_id }}
+          path: ${{ inputs.simplecov_report_path }}
+        continue-on-error: true
+      - run: ${{ inputs.simplecov_command }}
+      - name: delete coverage report
         uses: geekyeggo/delete-artifact@v1
         with:
-          name: tmp-coverage-report
-          failOnError: true
-      - uses: pinnacles/simplecov-report-action@v1.5.0
-        if: ${{ needs.test-in-parallel-with-mysql.outputs.pull_request_number != '' }}
+          name: coverage-report-${{ github.run_id }}
+          failOnError: false
+      - name: download head of baseRef coverage report
+        uses: dawidd6/action-download-artifact@v2
         with:
-          token: ${{ secrets.github_pat }}
-          event_name: push
-          pr_number: ${{ needs.test-in-parallel-with-mysql.outputs.pull_request_number }}
-          head_branch: master
+          branch: ${{ github.base_ref }}
+          name: coverage-head
+          workflow: report.yml
+          path: baseref_coverage
+        continue-on-error: true
+      - name: download specific sha of baseRef coverage report if its exist
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          branch: ${{ github.base_ref }}
+          name: coverage-${{ needs.dependency-resolution.outputs.base_ref_hash }}
+          workflow: report.yml
+          path: baseref_coverage
+        continue-on-error: true
+      - uses: pinnacles/simplecov-report-action@v1.6.1
+        with:
+          headRefCoveragePath: ${{ inputs.simplecov_report_path }}/coverage.json
+          baseRefCoveragePath: baseref_coverage/coverage.json
+          token: ${{ secrets.GITHUB_TOKEN }}
+          baseBranch: ${{ github.base_ref }}
+        continue-on-error: true
 
   build:
     name: execute `make build`
@@ -349,6 +394,7 @@ jobs:
         test-in-parallel,
         test-in-parallel-with-mysql,
         build,
+        simplecov-report-action,
       ]
     if: ${{ ! failure() }}
     runs-on: ubuntu-latest

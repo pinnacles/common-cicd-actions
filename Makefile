@@ -13,13 +13,18 @@ help: ## Print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 lint: ## executes lint step
-	@echo "target: lint" && ./test.sh
+	@echo "target: lint" && ./test/test.sh
 
 test: ## executes test step
-	@echo "target: test" && ./test.sh
+	@echo "target: test" && ./test/test.sh
 
 build: ## executes build step
-	@echo "target: build" && ./test.sh
+	@echo "target: build" && ./test/test.sh
 
 post-process: ## executes post-process step
-	@echo "target: post-process" && ./test.sh
+	@echo "target: post-process" && ./test/test.sh
+
+simplecov:
+	@echo "execute simplecov"
+	mkdir baseref_coverage
+	cp test/increaseCoverage.json baseref_coverage/coverage.json

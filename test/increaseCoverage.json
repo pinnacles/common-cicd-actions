@@ -1,0 +1,73 @@
+{
+  "timestamp": 1654786235,
+  "command_name": "rspec_1003, rspec_958, rspec_967, rspec_976, rspec_985, rspec_994",
+  "files": [],
+  "metrics": {
+    "covered_percent": 60.35632183908046,
+    "covered_strength": 4.660689655172414,
+    "covered_lines": 4381,
+    "total_lines": 8700,
+    "groups": {
+      "Controllers": {
+        "covered_percent": 52.5764192139738,
+        "covered_strength": 3.163755458515284,
+        "covered_lines": 390
+      },
+      "Channels": {
+        "covered_percent": 100,
+        "covered_strength": 0,
+        "covered_lines": 0
+      },
+      "Models": {
+        "covered_percent": 57.52895752895753,
+        "covered_strength": 3.6911196911196913,
+        "covered_lines": 894
+      },
+      "Mailers": {
+        "covered_percent": 35.714285714285715,
+        "covered_strength": 2.142857142857143,
+        "covered_lines": 15
+      },
+      "Helpers": {
+        "covered_percent": 51.61290322580645,
+        "covered_strength": 3.096774193548387,
+        "covered_lines": 16
+      },
+      "Jobs": {
+        "covered_percent": 100,
+        "covered_strength": 0,
+        "covered_lines": 0
+      },
+      "Libraries": {
+        "covered_percent": 44.94117647058823,
+        "covered_strength": 5.7176470588235295,
+        "covered_lines": 191
+      },
+      "Lib": {
+        "covered_percent": 44.94117647058823,
+        "covered_strength": 5.7176470588235295,
+        "covered_lines": 191
+      },
+      "Entities": {
+        "covered_percent": 92.6948051948052,
+        "covered_strength": 5.561688311688312,
+        "covered_lines": 571
+      },
+      "Facades": {
+        "covered_percent": 38.69516310461192,
+        "covered_strength": 2.3217097862767155,
+        "covered_lines": 688
+      },
+      "Policies": {
+        "covered_percent": 50.69124423963134,
+        "covered_strength": 3.0414746543778803,
+        "covered_lines": 220
+      },
+      "Ungrouped": {
+        "covered_percent": 48.07162534435262,
+        "covered_strength": 7.033057851239669,
+        "covered_lines": 1396
+      }
+    }
+  }
+}

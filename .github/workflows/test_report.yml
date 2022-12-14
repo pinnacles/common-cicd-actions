@@ -1,0 +1,33 @@
+name: Test report.yml
+
+on:
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test-report:
+    uses: ./.github/workflows/report.yml
+    with:
+      ruby_version: 3.1.0
+    secrets:
+      github_pat: dummy
+
+  test-ci-test-in-parallel:
+    uses: ./.github/workflows/report.yml
+    with:
+      ruby_version: 3.1.0
+      test_in_parallel: true
+    secrets:
+      github_pat: dummy
+
+  test-ci-test-in-parallel-with-simplecov:
+    uses: ./.github/workflows/report.yml
+    with:
+      ruby_version: 3.1.0
+      test_in_parallel: true
+      use_simplecov_report: true
+      simplecov_report_path: test/coverage.json
+      simplecov_command: "make simplecov"
+    secrets:
+      github_pat: dummy

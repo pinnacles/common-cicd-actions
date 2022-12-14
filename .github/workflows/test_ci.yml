@@ -16,7 +16,6 @@ jobs:
       node_package_manager: ""
       use_go: false
       go_version: ""
-      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -30,7 +29,6 @@ jobs:
       node_package_manager: "yarn"
       use_go: false
       go_version: ""
-      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -44,7 +42,6 @@ jobs:
       node_package_manager: ""
       use_go: true
       go_version: 1.17.6
-      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -58,7 +55,6 @@ jobs:
       node_package_manager: "yarn"
       use_go: false
       go_version: ""
-      test_ci_mode: true
     secrets:
       github_pat: dummy
 
@@ -73,6 +69,22 @@ jobs:
       use_go: false
       go_version: ""
       test_in_parallel: true
-      test_ci_mode: true
+    secrets:
+      github_pat: dummy
+
+  test-ci-test-in-parallel-with-simplecov:
+    uses: ./.github/workflows/ci.yml
+    with:
+      use_ruby: true
+      ruby_version: 3.1.0
+      use_node: false
+      node_version: ""
+      node_package_manager: ""
+      use_go: false
+      go_version: ""
+      test_in_parallel: true
+      use_simplecov_report: true
+      simplecov_report_path: test
+      simplecov_command: "make simplecov"
     secrets:
       github_pat: dummy
