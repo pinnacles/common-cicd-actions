@@ -394,6 +394,7 @@ jobs:
         test-in-parallel,
         test-in-parallel-with-mysql,
         build,
+        simplecov-report-action,
       ]
     if: ${{ ! failure() }}
     runs-on: ubuntu-latest
