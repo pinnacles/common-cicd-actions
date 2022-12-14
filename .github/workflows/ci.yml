@@ -81,7 +81,8 @@ jobs:
         with:
           fetch-depth: 0
       - name: store base_ref hash with output parameter
-        run: echo "::set-output name=bash_ref_hash::$(git show-branch --merge-base --sha1-name ${{ github.base_ref }} ${{ github.head_ref }} || echo "")"
+        run: |
+          echo "::set-output name=bash_ref_hash::$(git show-branch --merge-base origin/${{ github.base_ref }} origin/${{ github.head_ref }} || echo "")"
         id: hash
       - name: get changed files
         id: changed-files
