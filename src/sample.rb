@@ -1,3 +1,0 @@
-#!/bin/ruby
-
-p "Hello"
