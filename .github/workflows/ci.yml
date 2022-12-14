@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
-      base_ref_hash: #{{ steps.hash.outputs.base_ref_hash }}
+      base_ref_hash: ${{ steps.hash.outputs.base_ref_hash }}
     steps:
       - uses: actions/checkout@v3
         with:
