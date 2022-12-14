@@ -76,6 +76,7 @@ jobs:
     outputs:
       all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
       base_ref_hash: ${{ steps.hash.outputs.base_ref_hash }}
+      ruby_is_changed: ${{ steps.check-ruby-is-changed.outputs.ruby_is_changed }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -87,6 +88,18 @@ jobs:
       - name: get changed files
         id: changed-files
         uses: tj-actions/changed-files@v1.1.2
+      - name: check whether ruby file exist in changed files or not
+        id: check-ruby-is-changed
+        run: |
+          DIRS=$(echo ${{ steps.changed-files.outputs.all_modified_files }} | tr " " "\n" | cut -f1,2,3 -d'/' | uniq | sort)
+          RUBY_CHANGED="false"
+          for DIR in ${DIRS}; do
+            if [[ ${DIR} =~ ^.*\.rb$ ]]; then
+              RUBY_CHANGED="true"
+              break
+            fi
+          done
+          echo "::set-output name=ruby_is_changed::${RUBY_CHANGED}"
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
@@ -304,7 +317,7 @@ jobs:
           if-no-files-found: warn
 
   simplecov-report-action:
-    if: ${{ inputs.use_simplecov_report == true && (always() && contains(needs.*.result, 'success') && !(contains(needs.*.result, 'failure'))) }}
+    if: ${{ (inputs.use_simplecov_report == true) && (always() && contains(needs.*.result, 'success') && !contains(needs.*.result, 'failure') && needs.dependency-resolution.outputs.ruby_is_changed == 'true')}}
     name: report simplecov coverage
     needs: [
       dependency-resolution,
@@ -330,13 +343,11 @@ jobs:
         with:
           name: coverage-report-${{ github.run_id }}
           path: ${{ inputs.simplecov_report_path }}
-        continue-on-error: true
       - run: ${{ inputs.simplecov_command }}
       - name: delete coverage report
         uses: geekyeggo/delete-artifact@v1
         with:
           name: coverage-report-${{ github.run_id }}
-          failOnError: false
       - name: download head of baseRef coverage report
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -344,7 +355,6 @@ jobs:
           name: coverage-head
           workflow: report.yml
           path: baseref_coverage
-        continue-on-error: true
       - name: download specific sha of baseRef coverage report if its exist
         uses: dawidd6/action-download-artifact@v2
         with:
@@ -359,7 +369,6 @@ jobs:
           baseRefCoveragePath: baseref_coverage/coverage.json
           token: ${{ secrets.GITHUB_TOKEN }}
           baseBranch: ${{ github.base_ref }}
-        continue-on-error: true
 
   build:
     name: execute `make build`
