@@ -355,6 +355,7 @@ jobs:
           name: coverage-head
           workflow: report.yml
           path: baseref_coverage
+        continue-on-error: true
       - name: download specific sha of baseRef coverage report if its exist
         uses: dawidd6/action-download-artifact@v2
         with:
