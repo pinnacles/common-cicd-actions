@@ -364,7 +364,7 @@ jobs:
           workflow: report.yml
           path: baseref_coverage
         continue-on-error: true
-      - uses: pinnacles/simplecov-report-action@v1.7.2
+      - uses: pinnacles/simplecov-report-action@v1.7.3
         with:
           headRefCoveragePath: ${{ inputs.simplecov_report_path }}/coverage.json
           baseRefCoveragePath: baseref_coverage/coverage.json
