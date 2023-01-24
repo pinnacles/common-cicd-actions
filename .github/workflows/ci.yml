@@ -72,7 +72,7 @@ jobs:
   dependency-resolution:
     if: ${{ github.event_name == 'pull_request' }}
     name: resolve dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     outputs:
       all_changed_files: ${{ steps.changed-files.outputs.all_modified_files }}
       base_ref_hash: ${{ steps.hash.outputs.base_ref_hash }}
@@ -113,7 +113,7 @@ jobs:
   lint:
     name: execute `make lint`
     needs: dependency-resolution
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
@@ -262,7 +262,7 @@ jobs:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
     name: execute `make test`
     needs: dependency-resolution
-    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}-4-cores
     services:
       db:
         image: mysql:${{ inputs.mysql_version }}
@@ -326,7 +326,7 @@ jobs:
       test-in-parallel,
       test-in-parallel-with-mysql,
     ]
-    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    runs-on: ubuntu-latest-4-cores
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
@@ -374,7 +374,7 @@ jobs:
   build:
     name: execute `make build`
     needs: dependency-resolution
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
