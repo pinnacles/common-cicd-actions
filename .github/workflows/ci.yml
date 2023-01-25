@@ -21,10 +21,6 @@ on:
         description: "node version"
         required: false
         type: string
-      node_package_manager:
-        description: "node package manager name"
-        required: false
-        type: string
       use_go:
         description: "whether use go or not"
         required: false
@@ -100,13 +96,12 @@ jobs:
             fi
           done
           echo "::set-output name=ruby_is_changed::${RUBY_CHANGED}"
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
 
@@ -116,13 +111,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - run: make lint
@@ -140,13 +134,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - run: make test
@@ -185,13 +178,12 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - run: make test
@@ -224,13 +216,12 @@ jobs:
         node_index: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
@@ -282,13 +273,12 @@ jobs:
         node_index: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - uses: pinnacles/common-cicd-actions/.github/actions/download-rspec-reports@v0.5.3
@@ -329,13 +319,12 @@ jobs:
     runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - name: download coverage report
@@ -377,13 +366,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.1.0
+      - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
         with:
           use_ruby: ${{ inputs.use_ruby }}
           ruby_version: ${{ inputs.ruby_version }}
           use_node: ${{ inputs.use_node }}
           node_version: ${{ inputs.node_version }}
-          node_package_manager: ${{ inputs.node_package_manager }}
           use_go: ${{ inputs.use_go }}
           go_version: ${{ inputs.go_version }}
       - run: make build
