@@ -20,10 +20,6 @@ inputs:
     description: 'node version'
     required: false
     type: string
-  node_package_manager:
-    description: 'node package manager name'
-    required: false
-    type: string
   use_go:
     description: 'whether use go or not'
     required: false
@@ -47,9 +43,16 @@ runs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ inputs.node_version }}
-        cache: ${{ inputs.node_package_manager }}
-    - name: Run yarn install
+        cache: 'yarn'
+    - name: Setup yarn cache
       if: ${{ inputs.use_node == 'true' }}
+      uses: actions/cache@v3
+      id: node_modules_cache_id
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/yarn.lock') }}
+    - name: Run yarn install
+      if: ${{ inputs.use_node == 'true' && steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
       shell: bash
       run: yarn install
     - name: Setup go
