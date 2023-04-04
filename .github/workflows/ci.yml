@@ -163,7 +163,7 @@ jobs:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == false }}
     name: execute `make test`
     needs: dependency-resolution
-    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    runs-on: ubuntu-latest
     services:
       db:
         image: mysql:${{ inputs.mysql_version }}
@@ -253,7 +253,7 @@ jobs:
     if: ${{ inputs.use_mysql == true && inputs.test_in_parallel == true }}
     name: execute `make test`
     needs: dependency-resolution
-    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    runs-on: ubuntu-latest
     services:
       db:
         image: mysql:${{ inputs.mysql_version }}
@@ -316,7 +316,7 @@ jobs:
       test-in-parallel,
       test-in-parallel-with-mysql,
     ]
-    runs-on: ubuntu-${{ startsWith(inputs.mysql_version, '5') && '18.04' || 'latest' }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: pinnacles/common-cicd-actions/.github/actions/setup-lang@v0.13.0
